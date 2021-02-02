@@ -1,0 +1,5 @@
+signalp6.egg-info/
+*__pycache__/*
+*.pyc
+*.pyo
+checkpoints/ensemble_model_signalp6.pt
