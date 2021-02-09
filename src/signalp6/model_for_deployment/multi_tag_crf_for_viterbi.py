@@ -72,7 +72,8 @@ def _viterbi_decode_onnx(
         # Set score to the next score if this timestep is valid (mask == 1)
         # and save the index that produces the next score
         # shape: (batch_size, num_tags)
-        # TODO this torch.where call is broken, uses
+        # TODO  this torch.where call is still broken in current pytorch release
+        # when trying to use onnx. fine with torchscript.
         mask_at_pos = mask[i].unsqueeze(1)
         score = torch.where(mask_at_pos, next_score, score)
         # score = torch.where(mask[i].unsqueeze(1), next_score, score)

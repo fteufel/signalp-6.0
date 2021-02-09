@@ -61,7 +61,9 @@ def log_metrics(metrics_dict, split: str, step: int):
     )
 
 
-# TODO quick fix for hyperparameter search, fix and move to utils. or get rid of this class completely.
+# This is a quick fix for hyperparameter search.
+# wandb reinit does not work on scientific linux yet, so use
+# a pseudo-wandb instead of the actual wandb library
 class DecoyConfig:
     def update(*args, **kwargs):
         pass
@@ -77,7 +79,7 @@ class DecoyWandb:
         pass
 
     def log(self, value_dict, *args, **kwargs):
-        # TODO should filter for train logs here, don't want to print at every step
+        # filter for train logs here, don't want to print at every step
         if list(value_dict.keys())[0].startswith("Train"):
             pass
         else:
@@ -132,8 +134,6 @@ def tagged_seq_to_cs_multiclass(tagged_seqs: np.ndarray, sp_tokens=[0, 4, 5]):
         """Func1d to get the last index that is tagged as SP. use with np.apply_along_axis. """
         sp_idx = np.where(np.isin(x, sp_tokens))[0]
         if len(sp_idx) > 0:
-            # TODO remove or rework to warning, in training might well be that continuity is not learnt yet (i don't enforce it in the crf setup)
-            # assert sp_idx.max() +1 - sp_idx.min() == len(sp_idx) #assert continuity. CRF should actually guarantee that (if learned correcty)
             max_idx = sp_idx.max() + 1
         else:
             max_idx = np.nan
@@ -157,7 +157,6 @@ def report_metrics(
     pred_cs = tagged_seq_to_cs_multiclass(
         pred_sequence_labels, sp_tokens=[4, 9, 14] if use_cs_tag else [3, 7, 11]
     )
-    # TODO decide on how to calcuate cs metrics: ignore no cs seqs, or non-detection implies correct cs?
     pred_cs = pred_cs[~np.isnan(true_cs)]
     true_cs = true_cs[~np.isnan(true_cs)]
     true_cs[np.isnan(true_cs)] = -1
@@ -670,7 +669,6 @@ def main_training_loop(args: argparse.ArgumentParser):
             (29, 30),
             # PILIN
             # 31 P, 32 CS, 33 H, 34 I, 35 M, 36 O
-            # TODO check transition from 33: to M or to O. Need to fix when making real h-region labels (so far ignoring TM info, just 10 pos h)
             (31, 31),
             (31, 32),
             (32, 32),
@@ -945,10 +943,9 @@ def main_training_loop(args: argparse.ArgumentParser):
         global_step,
     )
 
-    print_all_final_metrics = True  # TODO get_metrics is not adapted yet to large crf
+    print_all_final_metrics = True
     if print_all_final_metrics == True:
         # reload best checkpoint
-        # TODO Kingdom ID handling needs to be added here.
         model = MODEL_DICT[args.model_architecture][1].from_pretrained(args.output_dir)
         ds = RegionCRFDataset(
             args.data,

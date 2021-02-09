@@ -136,7 +136,7 @@ def apply_sliding_hydrophobicity_window(sequence: np.ndarray, window_size=7) -> 
     ):
         subseq = sequence[start_idx : start_idx + 7]
         hydropathy_score = sum([KYTE_DOOLITTE[res] for res in subseq])
-        # TODO define tie-breaking behavior: > or => ?
+
         if hydropathy_score > best_score:
             best_score = hydropathy_score
             most_hydrophobic_pos = start_idx + ceil(
@@ -150,7 +150,6 @@ def apply_sliding_hydrophobicity_window(sequence: np.ndarray, window_size=7) -> 
 def find_twin_arginine(sequence: str) -> Tuple[int, int]:
     """Find the last RR in sequence. If no RR, tries KR.
     If no KR, takes last R and considers +1 and -1 of it RR states"""
-    # TODO h,n need to know when labels get probabilistic
     last_rr_start = sequence.rfind("RR")
     last_rr_end = last_rr_start + 1
 
@@ -200,9 +199,7 @@ def process_SP(
         "TATLIPO": "T",
         "PILIN": "P",
     }
-    last_idx = label_sequence.rfind(
-        type_tokens[sp_type]
-    )  # TODO needs to be based on sp_type
+    last_idx = label_sequence.rfind(type_tokens[sp_type])
 
     sp = [x for x in aa_sequence[: last_idx + 1]]
     sp = np.array(sp)

@@ -169,9 +169,7 @@ class BertSequenceTaggingCRF(BertPreTrainedModel):
         self.sp_region_tagging = (
             config.use_region_labels if hasattr(config, "use_region_labels") else False
         )  # use the right global prob aggregation function
-        self.use_large_crf = (
-            True  # config.use_large_crf #TODO legacy for get_metrics, no other use.
-        )
+        self.use_large_crf = True  # legacy for get_metrics, no other use.
 
         ## Loss scaling parameters
         self.crf_scaling_factor = (
@@ -390,7 +388,6 @@ class BertSequenceTaggingCRF(BertPreTrainedModel):
         """Compute the global labels as sum over marginal probabilities, normalizing by seuqence length.
         For agrregation, the EXTENDED_VOCAB indices from signalp_dataset.py are hardcoded here.
         If num_global_labels is 2, assume we deal with the sp-no sp case.
-        TODO refactor, implicit handling of eukarya-only and cs-state cases is hard to keep track of
         """
         # probs = b_size x seq_len x n_states tensor
         # Yes, each SP type will now have 4 labels in the CRF. This means that now you only optimize the CRF loss, nothing else.
@@ -401,7 +398,6 @@ class BertSequenceTaggingCRF(BertPreTrainedModel):
         if mask is None:
             mask = torch.ones(probs.shape[0], probs.shape[1], device=probs.device)
 
-        # TODO check unsqueeze ops for division/multiplication broadcasting
         summed_probs = (probs * mask.unsqueeze(-1)).sum(
             dim=1
         )  # sum probs for each label over axis
@@ -477,9 +473,7 @@ class BertSequenceTaggingCRF(BertPreTrainedModel):
 
         # reweight
         if weights is not None:
-            probs = (
-                probs * weights
-            )  # TODO check broadcasting, think should just work, 1 axis agrees
+            probs = probs * weights
         # predict
         preds = probs.argmax(dim=1)
 

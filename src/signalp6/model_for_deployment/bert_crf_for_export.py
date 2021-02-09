@@ -230,9 +230,7 @@ class BertSequenceTaggingCRF(BertPreTrainedModel):
         self.sp_region_tagging = (
             config.use_region_labels if hasattr(config, "use_region_labels") else False
         )  # use the right global prob aggregation function
-        self.use_large_crf = (
-            True  # config.use_large_crf #TODO legacy for get_metrics, no other use.
-        )
+        self.use_large_crf = True  # legacy for get_metrics, no other use.
 
         ## Loss scaling parameters
         self.crf_scaling_factor = (

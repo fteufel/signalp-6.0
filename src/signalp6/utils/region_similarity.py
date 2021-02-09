@@ -102,7 +102,6 @@ def compute_region_cosine_similarity(
         aa_sequences
     ), "Need same number of tag and amino acid sequences"
 
-    # TODO check for invalid labels in sequence
     n_h_similarities = []
     h_c_similarities = []
 
@@ -219,7 +218,6 @@ def get_region_start_end(tag_sequence, token_ids: List[int]):
     if type(tag_sequence) == np.ndarray:
         tag_sequence = list(tag_sequence)
 
-    # TODO catch ValueError when id not in tag_sequence
     start_idx = 1000
     end_idx = -1
     for token_id in token_ids:
@@ -252,7 +250,7 @@ def get_region_lengths(
     agg_fn="mean",
 ):
     """Calculate the mean length of each region.
-    Only counts tags in a sequence, does not check whether the tags are contiguous TODO this causes problems.
+    Only counts tags in a sequence, does not check whether the tags are contiguous. Assume CRF enforces that anyway.
     Inputs:
         tag_sequences: viterbi path of each sequence
         class_labels: global label of each sequence

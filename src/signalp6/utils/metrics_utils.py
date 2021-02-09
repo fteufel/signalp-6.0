@@ -243,8 +243,6 @@ def tagged_seq_to_cs_multiclass(tagged_seqs: np.ndarray, sp_tokens=[0, 4, 5]):
         """Func1d to get the last index that is tagged as SP. use with np.apply_along_axis. """
         sp_idx = np.where(np.isin(x, sp_tokens))[0]
         if len(sp_idx) > 0:
-            # TODO remove or rework to warning, in training might well be that continuity is not learnt yet (i don't enforce it in the crf setup)
-            # assert sp_idx.max() +1 - sp_idx.min() == len(sp_idx) #assert continuity. CRF should actually guarantee that (if learned correcty)
             max_idx = sp_idx.max() + 1
         else:
             max_idx = -1
@@ -268,8 +266,6 @@ def find_cs_tag(tagged_seqs: np.ndarray, cs_tokens=[4, 9, 14]):
         """Func1d to get the last index that is tagged as SP. use with np.apply_along_axis. """
         sp_idx = np.where(np.isin(x, cs_tokens))[0]
         if len(sp_idx) > 0:
-            # TODO remove or rework to warning, in training might well be that continuity is not learnt yet (i don't enforce it in the crf setup)
-            # assert sp_idx.max() +1 - sp_idx.min() == len(sp_idx) #assert continuity. CRF should actually guarantee that (if learned correcty)
             max_idx = sp_idx.max() + 1
         else:
             max_idx = -1
@@ -348,7 +344,6 @@ def mask_cs(
     return true_CS, pred_CS
 
 
-# TODO adjust compute_metrics to proper code after Kostas told me how to do it:
 def compute_metrics(
     all_global_targets: np.ndarray,
     all_global_preds: np.ndarray,
@@ -549,8 +544,8 @@ def get_metrics(
 
 def get_region_metrics(all_global_targets, all_pos_preds, all_input_ids, sp_lengths):
 
-    # TODO skip indices are hardcoded
-    # TODO only report set means, not per kingdom yet
+    # NOTE skip indices are hardcoded
+    # NOTE only report set means, not per kingdom yet
 
     n_h, h_c = class_aware_cosine_similarities(
         all_pos_preds,
