@@ -3,6 +3,9 @@ Utilities to compute additional metrics from webserver outputs.
 This is useful for evaluating regions.
 The server itself only returns the region positions,
 it does not compute any additional properties.
+
+region_features_from_server_ouput skips all sequences in input that
+had no regions predicted (only sequences that are in region_output.gff3)
 """
 import os
 import pandas as pd
@@ -40,7 +43,7 @@ def make_one_dataframe(regions_gff: str, output_gff: str, processed_fasta: str):
         output_gff,
         sep="\t",
         skiprows=1,
-        names=["ID", "Source", "SP type", "Start", "End", ".1", ".2", ".3", ".4"],
+        names=["ID", "Source", "SP type", "Start", "End", ".1", ".2", ".3", "Note"],
     )
 
     df_seqs = read_fasta(processed_fasta)
@@ -50,7 +53,14 @@ def make_one_dataframe(regions_gff: str, output_gff: str, processed_fasta: str):
 
     # merge on ID
     df_regions = df_regions.merge(df_seqs, on="ID")
-    df_regions = df_regions.merge(df_type[["ID", "SP type", "End"]], on="ID")
+    df_regions = df_regions.merge(df_type[["ID", "SP type", "End", "Note"]], on="ID")
+
+    # make proper SP type. gff3 only specifies 'signal_peptide' and 'lipoprotein_signal_peptide'
+    # rest is in Note column.
+    for idx, row in df_regions.iterrows():
+        if row['Note'] == 'Note=TAT':
+            df_regions.loc[idx, 'SP type'] = 'tat_' + df_regions.loc[idx, 'SP type'] 
+    df_regions = df_regions.drop('Note',axis=1)
 
     return df_regions
 
@@ -87,6 +97,11 @@ KYTE_DOOLITTE = {
     "N": -3.5,
     "K": -3.9,
     "R": -4.5,
+    "U": 2.5, #selenocysteine, assume same as C
+    "X": 0, #any 
+    "B": -3.5, # D or N
+    "Z": -3.5, #Q or E
+    "O": -3.9, # Pyrollysine, don't really know, assume same as Lysine
 }
 aas = {
     "A": 0,
@@ -109,6 +124,11 @@ aas = {
     "W": 17,
     "Y": 18,
     "V": 19,
+    "U": 20,
+    "X": 21,
+    "B": 22,
+    "Z": 23,
+    "O": 24,
 }
 
 # make new dict mapping idx to kd score
@@ -143,8 +163,12 @@ def compute_region_features(df: pd.DataFrame) -> pd.DataFrame:
     df_results.loc[:, "rel_len_h"] = df_results["len_h"] / df_results["len_sp"]
     df_results.loc[:, "rel_len_c"] = df_results["len_c"] / df_results["len_sp"]
 
+    # replace nas with -1, so that we can apply same function to each row irrespective
+    # of whether a region is really there. Mask out spurious results afterwards.
+    df_filled = df.fillna(-1)
+
     # biochemical features
-    for idx, row in df.iterrows():
+    for idx, row in df_filled.iterrows():
         # cut substrings
         # we do this in arrays, so we can use bincount for frequencies
         sequence = np.array([aas[x] for x in row["Sequence"]])
@@ -159,10 +183,14 @@ def compute_region_features(df: pd.DataFrame) -> pd.DataFrame:
             int(row["Start", "c-region"]) - 1 : int(row["End", "c-region"])
         ]
 
+        if row['SP type'] in ['lipoprotein_signal_peptide', 'tat_lipoprotein_signal_peptide']:
+            c_seq = []
+
         # count the AAs
-        aas_n = np.bincount(n_seq, minlength=20)
-        aas_h = np.bincount(h_seq, minlength=20)
-        aas_c = np.bincount(c_seq, minlength=20)
+        minlength = len(aas)
+        aas_n = np.bincount(n_seq, minlength=minlength)
+        aas_h = np.bincount(h_seq, minlength=minlength)
+        aas_c = np.bincount(c_seq, minlength=minlength)
         aas_all = aas_n + aas_h + aas_c
 
         # based on the AA counts, compute features
@@ -175,6 +203,10 @@ def compute_region_features(df: pd.DataFrame) -> pd.DataFrame:
         df_results.loc[idx, "chr_h"] = compute_net_charge(aas_h)
         df_results.loc[idx, "chr_c"] = compute_net_charge(aas_c)
         df_results.loc[idx, "chr_sp"] = compute_net_charge(aas_all)
+
+    # mask out based on global label.
+    df_results.loc[df_results['SP type']=='lipoprotein_signal_peptide', ['len_c', 'rel_len_c', 'hyd_c', 'chr_c']] = np.nan
+    df_results.loc[df_results['SP type']=='tat_lipoprotein_signal_peptide', ['len_c', 'rel_len_c', 'hyd_c', 'chr_c']] = np.nan
 
     return df_results
 
