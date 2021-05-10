@@ -4,7 +4,7 @@ This is useful for evaluating regions.
 The server itself only returns the region positions,
 it does not compute any additional properties.
 
-region_features_from_server_ouput skips all sequences in input that
+region_features_from_server_output skips all sequences in input that
 had no regions predicted (only sequences that are in region_output.gff3)
 """
 import os
@@ -29,7 +29,6 @@ def make_one_dataframe(regions_gff: str, output_gff: str, processed_fasta: str):
     into one df with the following 11-column format:
     ID	(Start, c-region) (Start, h-region)	(Start, n-region) (Start, twin-arginine motif) (End, c-region) (End, h-region) \
         (End, n-region)	(End, twin-arginine motif)	Sequence	SP type
-
     """
     # read in everything
     df_regions = pd.read_csv(
@@ -59,7 +58,9 @@ def make_one_dataframe(regions_gff: str, output_gff: str, processed_fasta: str):
     # rest is in Note column.
     for idx, row in df_regions.iterrows():
         if row['Note'] == 'Note=TAT':
-            df_regions.loc[idx, 'SP type'] = 'tat_' + df_regions.loc[idx, 'SP type'] 
+            df_regions.loc[idx, 'SP type'] = 'tat_' + df_regions.loc[idx, 'SP type']
+        if row['Note'] == 'Note=Pilin':
+            df_regions.loc[idx, 'SP type'] ='pilin_' + df_regions.loc[idx, 'SP type']
     df_regions = df_regions.drop('Note',axis=1)
 
     return df_regions
@@ -154,9 +155,23 @@ def compute_region_features(df: pd.DataFrame) -> pd.DataFrame:
     df_results = df[["ID", "SP type"]].copy()
 
     # simple region length features
-    df_results.loc[:, "len_n"] = df["End", "n-region"] - df["Start", "n-region"]
-    df_results.loc[:, "len_h"] = df["End", "h-region"] - df["Start", "h-region"]
-    df_results.loc[:, "len_c"] = df["End", "c-region"] - df["Start", "c-region"]
+    # always check whether a region is really there. Otherwise 
+    # fails on lipo/no-sp/pilin-only dataframes.
+    if ('Start', 'n-region') in df.columns and ('End', 'n-region') in df.columns:
+        df_results.loc[:, "len_n"] = df["End", "n-region"] - df["Start", "n-region"]
+    else:
+        df_results.loc[:, "len_n"] = np.nan
+        
+    if ('Start', 'h-region') in df.columns and ('End', 'h-region') in df.columns:
+        df_results.loc[:, "len_h"] = df["End", "h-region"] - df["Start", "h-region"]
+    else:
+        df_results.loc[:, "len_h"] = np.nan
+        
+    if ('Start', 'c-region') in df.columns and ('End', 'c-region') in df.columns:
+        df_results.loc[:, "len_c"] = df["End", "c-region"] - df["Start", "c-region"]
+    else:
+        df_results.loc[:, "len_c"] = np.nan
+    
     df_results.loc[:, "len_sp"] = df["End"]
 
     df_results.loc[:, "rel_len_n"] = df_results["len_n"] / df_results["len_sp"]
@@ -173,18 +188,24 @@ def compute_region_features(df: pd.DataFrame) -> pd.DataFrame:
         # we do this in arrays, so we can use bincount for frequencies
         sequence = np.array([aas[x] for x in row["Sequence"]])
         # NOTE we need to -1 the start idx (are in +1 format). For the end, need to keep the +1
-        n_seq = sequence[
-            int(row["Start", "n-region"]) - 1 : int(row["End", "n-region"])
-        ]
-        h_seq = sequence[
-            int(row["Start", "h-region"]) - 1 : int(row["End", "h-region"])
-        ]
-        c_seq = sequence[
-            int(row["Start", "c-region"]) - 1 : int(row["End", "c-region"])
-        ]
-
+        if row['SP type'] in ['signal_peptide', 'lipoprotein_signal_peptide', 'tat_signal_peptide', 'tat_lipoprotein_signal_peptide']:
+            n_seq = sequence[
+                int(row["Start", "n-region"]) - 1 : int(row["End", "n-region"])
+            ]
+            h_seq = sequence[
+                int(row["Start", "h-region"]) - 1 : int(row["End", "h-region"])
+            ]
+        else:
+            n_seq = []
+            h_seq = []
+        
         if row['SP type'] in ['lipoprotein_signal_peptide', 'tat_lipoprotein_signal_peptide']:
             c_seq = []
+        else:
+            c_seq = sequence[
+                int(row["Start", "c-region"]) - 1 : int(row["End", "c-region"])
+            ]
+
 
         # count the AAs
         minlength = len(aas)
