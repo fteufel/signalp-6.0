@@ -1,4 +1,5 @@
-# signalp-6.0
+# SignalP 6.0
+
 Signal peptide prediction model based on a [Bert protein language model encoder](https://github.com/agemagician/ProtTrans) and a conditional random field (CRF) decoder.
 
 This is the development codebase. If you are looking for the prediction service, go to https://services.healthtech.dtu.dk/service.php?SignalP-6.0.
