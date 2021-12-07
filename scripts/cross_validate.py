@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Compute cross-validated metrics. Run each model
 on its test set, compute all metrics and save as .csv

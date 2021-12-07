@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Collection of PHYLUM identifiers from Uniprot.
 Apply get_kingdom() to a list of PHYLUM IDs to get

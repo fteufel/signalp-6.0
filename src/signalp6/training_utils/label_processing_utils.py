@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Utilities to process deterministic SignalP labels
 [S: Sec/SPI signal peptide | T: Tat/SPI signal peptide | L: Sec/SPII signal peptide | I: cytoplasm | M: transmembrane | O: extracellular]

@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Script to train Bert-CRF (SignalP 6.0).
 

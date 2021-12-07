@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Make the evaluation plots. 
 Reqires the following:

@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Averaging the viterbi decoding.
 

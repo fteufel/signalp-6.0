@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Distill ensemble model (6 models) into one.
 

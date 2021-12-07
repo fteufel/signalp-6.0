@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Compute the cosine similarity between n,h,c regions.
 This is used for evaluation.

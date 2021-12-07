@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Utils to calculate metrics for SP tagging models.
 Last version had the shortcoming of rerunning subsets of the data when getting metrics per kingdom/one-vs-all mccs.

@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Dataset to deal with the 3-line fasta format used in SignalP.
 """

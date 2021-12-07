@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 import torch
 import torch.nn as nn
 import sys

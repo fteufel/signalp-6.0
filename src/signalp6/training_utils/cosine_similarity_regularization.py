@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 The cosine similarity can be used as a regularization term.
 

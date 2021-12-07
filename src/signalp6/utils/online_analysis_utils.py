@@ -1,3 +1,4 @@
+# © Copyright Technical University of Denmark
 """
 Utilities to compute additional metrics from webserver outputs.
 This is useful for evaluating regions.
