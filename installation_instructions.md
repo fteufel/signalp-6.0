@@ -46,16 +46,23 @@ To prevent invalid file paths, non-alphanumeric characters in fasta headers are 
 - `--organism`, `-org`, is either `other` or `eukarya`. Specifying `eukarya` triggers post-processing of the SP predictions to prevent spurious results (only predicts type Sec/SPI).   
 Defaults to `other`.
 
-- `--format`, `-fmt`, can take the values `txt`, `png`, `eps`, `all`. It defines what output files are created for individual sequences. `txt` produces a tabular `.gff` file with the per-position predictions for each sequence. `png`, `eps`, `all` additionally produce probability plots in the requested format. For larger prediction jobs, plotting will slow down the processing speed significantly.  
+- `--format`, `-fmt`, can take the values `txt`, `png`, `eps`, `all`, `none`. It defines what output files are created for individual sequences. `txt` produces a tabular `.gff` file with the per-position predictions for each sequence. `png`, `eps`, `all` additionally produce probability plots in the requested format. `none` only writes the summary prediction files. For larger prediction jobs, plotting will slow down the processing speed significantly.  
 Defaults to `txt`.
 
 - `--mode`, `-m`, is either `fast`, `slow` or `slow-sequential`. Default is `fast`, which uses a smaller model that approximates the performance of the full model, requiring a fraction of the resources and being significantly faster. `slow` runs the full model in parallel, which requires more than 14GB of RAM to be available. `slow-sequential` runs the full model sequentially, taking the same amount of RAM as `fast` but being 6 times slower. If the specified model is not installed, SignalP will abort with an error.   
 Defaults to `fast`.
 
+#### Performance optimization
+
+- `--bsize`, `-bs` is the integer batch size used for prediction. When running on GPU, this should be adjusted to maximize usage of the available memory. On CPU, the choice usually has only a limited effect on performance. Defaults to `10`.
+
+- `--write_procs`, `-wp` is the integer number of parallel processes launched for writing output files. Using multiple processes significantly speeds up writing the outputs for prediction jobs with many sequences. However, due to the way multiprocessing works in Python, this leads to increased memory usage. By setting to `1`, no additional processes are started. Defaults to the number of available CPUs with `8` processes maximum.
+
 ### Output interpretation
 
 The installed version produces the same outputs as the SignalP 6.0 webserver. For interpretation instructions, please consult   https://services.healthtech.dtu.dk/service.php?SignalP-6.0/.  
-The following files are always created:
+
+**The following files are always created:**
 
 #### `prediction_results.txt`
 A tab delimited file with one line per prediction. 
@@ -77,10 +84,11 @@ The start and end positions of all predicted signal peptide regions in GFF3 form
 #### `output.json`
 The prediction results in JSON format, together with details on the run parameters and paths to the generated output files. Useful for integrating SignalP 6.0 in pipelines. 
 
-#### `SEQUENCE_NAME.txt`
-One such file is generated for each predicted sequence. Contains the predicted label and probabilities at each sequence position.
 
-These files are optional:
+**These single-sequence files are optional:**
+
+#### `SEQUENCE_NAME.txt`
+Contains the predicted label and probabilities at each sequence position in tabular format.
 
 #### `SEQUENCE_NAME.png` and `SEQUENCE_NAME.eps`
 A plot of the predicted labels and probabilities of the sequence.
@@ -110,8 +118,16 @@ For scientific questions, contact henni@dtu.dk.
 -------------------------
 ## Updates
 
+### 6.0d
+- Add `none` as a format for single-sequence output files.
+- Option `--write_procs` to disable multiprocessing for writing output files.
+- Improved resolving of cases with missing CS.
 
-### 6.0a
+### 6.0c
+- Fix region output when using the `eukarya` mode.
+- Handle Sec/SPII and Tat/SPII SPs correctly when resolving cases with no CS reported.
+
+### 6.0b
 - Fix issue where some predicted SPs did not have a CS reported. SignalP 6.0 now automatically resolves such cases. Can be disabled with `--skip-resolve`.
 - Updated CLI to better match SignalP 5.0:
     - Accept argument aliases `-fasta`, `-batch`, `-format`, `-org`.
@@ -123,7 +139,7 @@ For scientific questions, contact henni@dtu.dk.
     - `signalp6` automatically infers whether to run on GPU when loading the model weight files.
 - No longer replace whitespace in fasta headers (except when writing files, still replace with `_` in filenames).
 
-### 6.0
+### 6.0a
 - Initial preprint release.
 
 ## Legacy hosts
