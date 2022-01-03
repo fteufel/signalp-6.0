@@ -1,7 +1,6 @@
 # SignalP 6.0 signal peptide prediction tool
 
-You can also read this markdown file with nice formatting at   
-https://github.com/fteufel/signalp-6.0/blob/main/installation_instructions.md.
+These instructions refer to the Python package available for download at https://services.healthtech.dtu.dk/service.php?SignalP-6.0.
 
 ## Installation
 SignalP 6.0 is distributed as a Python package.
