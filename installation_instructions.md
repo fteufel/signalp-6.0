@@ -1,6 +1,7 @@
 # SignalP 6.0 signal peptide prediction tool
 
-These instructions refer to the Python package available for download at https://services.healthtech.dtu.dk/service.php?SignalP-6.0.
+You can also read this markdown file with nice formatting at   
+https://github.com/fteufel/signalp-6.0/blob/main/installation_instructions.md.
 
 ## Installation
 SignalP 6.0 is distributed as a Python package.
@@ -117,6 +118,9 @@ For scientific questions, contact henni@dtu.dk.
 
 -------------------------
 ## Updates
+
+### 6.0e
+- Automatically resolve rare cases where the predicted regions do not match the predicted type.
 
 ### 6.0d
 - Add `none` as a format for single-sequence output files.
