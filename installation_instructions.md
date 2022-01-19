@@ -87,10 +87,10 @@ The prediction results in JSON format, together with details on the run paramete
 
 **These single-sequence files are optional:**
 
-#### `SEQUENCE_NAME.txt`
+#### `SEQUENCE_NAME_plot.txt`
 Contains the predicted label and probabilities at each sequence position in tabular format.
 
-#### `SEQUENCE_NAME.png` and `SEQUENCE_NAME.eps`
+#### `SEQUENCE_NAME_plot.png` and `SEQUENCE_NAME_plot.eps`
 A plot of the predicted labels and probabilities of the sequence.
 
 
@@ -117,6 +117,11 @@ For scientific questions, contact henni@dtu.dk.
 
 -------------------------
 ## Updates
+
+### 6.0f
+- Fix issue with `eukarya` mode introduced in 6.0e
+- Add `--version` option to access current version number.
+- Mode now automatically switches to `slow-sequential` if `slow` is not available.
 
 ### 6.0e
 - Automatically resolve rare cases where the predicted regions do not match the predicted type.
