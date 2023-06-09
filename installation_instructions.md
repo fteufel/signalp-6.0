@@ -13,10 +13,12 @@ pip install signalp-6-package/
 ```
 
 4. Copy the model files to the location at which the signalp module got installed. The model weight files are large, so this might take a while.
+(Alternatively, you can copy the directory to any other location on your system and run later with `signalp6 --model_dir /path/to/models/`)
 ```
 SIGNALP_DIR=$(python3 -c "import signalp; import os; print(os.path.dirname(signalp.__file__))" )
 cp -r signalp-6-package/models/* $SIGNALP_DIR/model_weights/
 ```
+
 5. The installer created a command `signalp6` on your system that is available within the python environment in which you ran step 2.
 6. \[Optional\]: SignalP 6.0 supports different run modes (see [Usage](#Usage)). Your download only included the one you picked. To make multiple run modes available in the same installation, you need to download and install additional model weights. Find instructions for that [below](#installing-additional-modes).
 7. \[Optional\]: By default SignalP 6.0 runs on CPU. If you have a GPU available, you can convert your installation to use it. Instructions for that are [below](#converting-to-gpu)
@@ -52,9 +54,13 @@ Defaults to `txt`.
 - `--mode`, `-m`, is either `fast`, `slow` or `slow-sequential`. Default is `fast`, which uses a smaller model that approximates the performance of the full model, requiring a fraction of the resources and being significantly faster. `slow` runs the full model in parallel, which requires more than 14GB of RAM to be available. `slow-sequential` runs the full model sequentially, taking the same amount of RAM as `fast` but being 6 times slower. If the specified model is not installed, SignalP will abort with an error.   
 Defaults to `fast`.
 
+- `model_dir`, `-md` allows you to specify an alternative directory containing the SignalP 6.0 model weight files. Defaults to the location that is used by the installation commands. Does not need to be specified when following the default installation instructions.
+
 #### Performance optimization
 
 - `--bsize`, `-bs` is the integer batch size used for prediction. When running on GPU, this should be adjusted to maximize usage of the available memory. On CPU, the choice usually has only a limited effect on performance. Defaults to `10`.
+
+- `--torch_num_threads`, `-tt` is the number of threads used by PyTorch. Defaults to `8`.
 
 - `--write_procs`, `-wp` is the integer number of parallel processes launched for writing output files. Using multiple processes significantly speeds up writing the outputs for prediction jobs with many sequences. However, due to the way multiprocessing works in Python, this leads to increased memory usage. By setting to `1`, no additional processes are started. Defaults to the number of available CPUs with `8` processes maximum.
 
@@ -73,7 +79,7 @@ Columns:
 - CS Position: The cleavage site. The sequence positions between which the SPase cleaves and its predicted probability.
 
 #### `processed_entries.fasta`
-The sequences that were predicted in one-line fasta format, as they were parsed by the program.
+Predicted mature proteins, i.e. sequences with their signal peptides removed.
 
 #### `output.gff3`
 The start and end positions of all predicted signal peptides in GFF3 format.
@@ -106,6 +112,9 @@ The model weights that come with the installation by default run on your CPU. If
 ```
 signalp6_convert_models gpu # makes all installed models run on GPU
 signalp6_convert_models cpu # reverts all models back to CPU
+
+# in case the installation uses a custom directory for the model weights
+signalp6_convert_models gpu /path/to/model/weights
 ```
 These conversion calls run a bash script that modifies the model files. Conversion will take a while as it involves repacking large zipped archives. 
 If the system does not have a GPU, the conversion call will fail. If you try to run GPU-coverted weights on CPU, signalp6 will fail.
@@ -117,6 +126,17 @@ For scientific questions, contact henni@dtu.dk.
 
 -------------------------
 ## Updates
+
+### 6.0h
+- Fixed a bug that caused spurious cleavage site predictions for very short sequences.
+- Allow alternative model weight locations. Control with new `--model_dir` argument.
+- Limited default PyTorch threads to 8. Can be adjusted using `--torch_num_threads`.
+- Restricted PyTorch version to <2.0 . SignalP 6.0 is not compatible with PyTorch 2.0+.
+- Offload computed emissions to CPU when running the slow model. Saves memory on GPU.
+- Output probabilities are now clipped to `[0,1]` to avoid spurious decimals from floating point errors when averaging multiple probabilities.
+
+### 6.0g
+- `processed_entries.fasta` now contains sequences with their SP trimmed, as in SignalP 5.0.
 
 ### 6.0f
 - Fix issue with `eukarya` mode introduced in 6.0e
