@@ -103,9 +103,9 @@ A plot of the predicted labels and probabilities of the sequence.
 ## Installing additional modes
 
 1. Download the package for the mode you would like to add to your installation.
-2. Unpack the downloaded package. The model is stored at `signalp-6-package/signalp/model_weights/`.
+2. Unpack the downloaded package. The model is stored at `signalp-6-package/models/`.
 3. Find the target destination of your current SignalP 6.0 installation. When installed with pip in a virtual environment, this should typically be something like `/PATH/TO/ENV/ENVIRONMENT_NAME/lib/python3.6/site-packages/signalp/model_weights`. A quick way to find out the target destination is to run SignalP 6.0 with a mode that is not installed and look at the resulting `ValueError`.
-4. Copy the content of the downloaded package into your installation. `cp -r signalp-6-package/signalp/model_weights/ /PATH/TO/ENV/ENVIRONMENT_NAME/lib/python3.6/site-packages/signalp/model_weights`. The additional mode should now be available and run without throwing an error.
+4. Copy the content of the downloaded package into your installation. `cp -r signalp-6-package/models/ /PATH/TO/ENV/ENVIRONMENT_NAME/lib/python3.6/site-packages/signalp/model_weights`. The additional mode should now be available and run without throwing an error.
 
 ## Converting to GPU
 The model weights that come with the installation by default run on your CPU. If you have a GPU available, you can convert your installation to use the GPU instead. This is done via a command that is available after installation:
@@ -176,3 +176,4 @@ Download the model weights you need at
  - slow, memory-hungry (parallel) model at https://mega.nz/file/TFUmSZxT#sQWPIlHtkWLJ1otfqxx1zeERUUu4D4YM3yvWefTXnUU (or at DTU)
  - fast model at https://mega.nz/file/uZ0DVQ7b#oDDerv_8mJmj1ypC_CX8OaWBxfYe4dXDvHGVgOiwCks (or at DTU)
  - slow, memory-saving (sequential) model for now only hosted at DTU.
+
