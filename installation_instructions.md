@@ -169,11 +169,3 @@ For scientific questions, contact henni@dtu.dk.
 
 ### 6.0a
 - Initial preprint release.
-
-## Legacy hosts
-
-Download the model weights you need at 
- - slow, memory-hungry (parallel) model at https://mega.nz/file/TFUmSZxT#sQWPIlHtkWLJ1otfqxx1zeERUUu4D4YM3yvWefTXnUU (or at DTU)
- - fast model at https://mega.nz/file/uZ0DVQ7b#oDDerv_8mJmj1ypC_CX8OaWBxfYe4dXDvHGVgOiwCks (or at DTU)
- - slow, memory-saving (sequential) model for now only hosted at DTU.
-
