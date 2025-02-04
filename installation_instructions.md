@@ -3,7 +3,7 @@
 These instructions refer to the Python package available for download at https://services.healthtech.dtu.dk/service.php?SignalP-6.0.
 
 ## Installation
-SignalP 6.0 is distributed as a Python package.
+SignalP 6.0 is distributed as a Python package. Python versions up to 3.10 are supported.
 
 1. Unpack the downloaded `tar.gz` file.
 2. \[Optional\]: Create a python environment to install the package in.
@@ -11,6 +11,11 @@ SignalP 6.0 is distributed as a Python package.
 ```
 pip install signalp-6-package/
 ```
+**Note for version 6.0h:** Due to a recent dependency change, please run 
+```
+pip install "numpy<2"
+```
+to ensure a compatible numpy version is installed.
 
 4. Copy the model files to the location at which the signalp module got installed. The model weight files are large, so this might take a while.
 (Alternatively, you can copy the directory to any other location on your system and run later with `signalp6 --model_dir /path/to/models/`)
@@ -18,6 +23,7 @@ pip install signalp-6-package/
 SIGNALP_DIR=$(python3 -c "import signalp; import os; print(os.path.dirname(signalp.__file__))" )
 cp -r signalp-6-package/models/* $SIGNALP_DIR/model_weights/
 ```
+
 
 5. The installer created a command `signalp6` on your system that is available within the python environment in which you ran step 2.
 6. \[Optional\]: SignalP 6.0 supports different run modes (see [Usage](#Usage)). Your download only included the one you picked. To make multiple run modes available in the same installation, you need to download and install additional model weights. Find instructions for that [below](#installing-additional-modes).
