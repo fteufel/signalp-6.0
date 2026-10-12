@@ -57,7 +57,7 @@ Defaults to `other`.
 - `--format`, `-fmt`, can take the values `txt`, `png`, `eps`, `all`, `none`. It defines what output files are created for individual sequences. `txt` produces a tabular `.gff` file with the per-position predictions for each sequence. `png`, `eps`, `all` additionally produce probability plots in the requested format. `none` only writes the summary prediction files. For larger prediction jobs, plotting will slow down the processing speed significantly.  
 Defaults to `txt`.
 
-- `--mode`, `-m`, is either `fast`, `slow` or `slow-sequential`. Default is `fast`, which uses a smaller model that approximates the performance of the full model, requiring a fraction of the resources and being significantly faster. `slow` runs the full model in parallel, which requires more than 14GB of RAM to be available. `slow-sequential` runs the full model sequentially, taking the same amount of RAM as `fast` but being 6 times slower. If the specified model is not installed, SignalP will abort with an error.   
+- `--mode`, `-m`, is either `fast`, or `slow-sequential`. Default is `fast`, which uses a smaller model that approximates the performance of the full model, requiring a fraction of the resources and being significantly faster. `slow-sequential` runs the full model sequentially, taking the same amount of RAM as `fast` but being 6 times slower. If the specified model is not installed, SignalP will abort with an error.  
 Defaults to `fast`.
 
 - `model_dir`, `-md` allows you to specify an alternative directory containing the SignalP 6.0 model weight files. Defaults to the location that is used by the installation commands. Does not need to be specified when following the default installation instructions.
@@ -129,6 +129,10 @@ If the system does not have a GPU, the conversion call will fail. If you try to 
 ## Bugs and Questions
 For technical issues (Bugs, missing functionality, poor documentation ...) contact felix.teufel@gmail.com or open an issue at https://github.com/fteufel/signalp-6.0.  
 For scientific questions, contact henni@dtu.dk.
+
+## FAQ
+
+- The mode `slow` has been discontinued and is no longer available for download. Please use `slow-sequential`, which produces the exact same results as `slow` at reduced memory usage.
 
 -------------------------
 ## Updates
